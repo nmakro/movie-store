@@ -19,6 +19,7 @@ def create_app():
 
     from app.model.users import User
     from app.model.movies import Movie
+    from app.model.categories import Category
 
     from .api import bp
 
