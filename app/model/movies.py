@@ -12,10 +12,9 @@ class Movie(db.Model):
 
     def movie_dict(self):
         data = {
-                "title": self.title,
                 "director": self.director,
                 "year": self.year,
-                "categories": [c.genre for c in self.categories]
+                "genre": [c.genre for c in self.categories]
             }
 
         return data
