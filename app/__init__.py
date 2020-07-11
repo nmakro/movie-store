@@ -17,6 +17,9 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
 
+    from app.model.users import User
+    from app.model.movies import Movie
+
     from .api import bp
 
     app.register_blueprint(bp, url_prefix="/api/v1")
