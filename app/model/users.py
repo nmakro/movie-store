@@ -1,3 +1,4 @@
+from datetime import date
 from app import db
 from app.model.table_associations import UserMovies
 
@@ -20,6 +21,9 @@ class User(db.Model):
             "movies": [m.title for m in self.movies]
         }
         return data
+
+    def rent_movie(self, movie):
+        self.movies.append(movie)
 
     def __repr__(self):
         return f"User: {self.username}"
