@@ -1,27 +1,21 @@
-from flask import request
+from flask import request, jsonify
 from app.api import bp
+from app.model.users import User
 
 
-@bp.route("/users/<int:id>", methods=["GET"])
-def get_user(id):
-    pass
+@bp.route("/users/<int:user_id>", methods=["GET"])
+def get_user(user_id):
+    return jsonify(User.query.get_or_404(user_id).user_dict())
 
 
-@bp.route("/users/", methods=["GET"])
-def get_users(id):
-    pass
+@bp.route("/users", methods=["GET"])
+def get_users():
+    res = User.query.order_by(User.id.desc()).paginate(1, 20, False).items
+    data = {"items": [user.user_dict() for user in res]}
+    return jsonify(data)
 
 
-@bp.route("/users/<int:id>/movies", methods=["GET"])
-def user_movies(id):
-    pass
+@bp.route("/users/<int:user_id>/movies", methods=["GET"])
+def user_movies(user_id):
+    return jsonify(User.query.get_or_404(user_id).get_movies())
 
-
-@bp.route("/users/all/movies", methods=["GET"])
-def get_all_movies_rent():
-    pass
-
-
-@bp.route("user/<int:id>/history", methods=["GET"])
-def get_user_history():
-    pass
