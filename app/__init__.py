@@ -9,7 +9,8 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    app_config = configMap[os.getenv("ENV_TYPE", default="PROD_ENV")]
+    # app_config = configMap[os.getenv("ENV_TYPE", default="PROD_ENV")]
+    app_config = configMap["DEV_ENV"]
 
     app.config.from_object(app_config)
     os.makedirs(app.instance_path, exist_ok=True)

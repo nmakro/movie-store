@@ -8,14 +8,21 @@ class Movie(db.Model):
     director = db.Column(db.String(64))
     year = db.Column(db.String(4))
     title = db.Column(db.String(64))
-    categories = db.relationship("Category", secondary=MovieCategories, backref=db.backref("movie_categories"))
+    category = db.relationship("Category", secondary=MovieCategories)
+    orders = db.relationship('Order', backref='ordered_movie')
 
-    def movie_dict(self):
+    def movie_dict(self, title=True, genre=True):
         data = {
+                "id": self.id,
+                "title": self.title,
                 "director": self.director,
                 "year": self.year,
-                "genre": [c.genre for c in self.categories]
+                "genre": [c.genre for c in self.category]
             }
+        if not title:
+            del data["title"]
+        if not genre:
+            del data["genre"]
 
         return data
 

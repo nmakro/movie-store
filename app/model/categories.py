@@ -6,7 +6,7 @@ class Category(db.Model):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
     genre = db.Column(db.String, index=True, unique=True)
-    movies = db.relationship("Movie", secondary=MovieCategories, backref=db.backref("category_movies"))
+    movies = db.relationship("Movie", secondary=MovieCategories)
 
     def category_dict(self):
         data = {
