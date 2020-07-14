@@ -37,7 +37,6 @@ def get_movie_from_title():
 
 
 @bp.route("/movies/", methods=["GET"])
-@bp.route("/movies", methods=["GET"])
 def list_movies():
     genre = request.args.get("genre")
     page = request.args.get("page", 1, type=int)
@@ -45,7 +44,7 @@ def list_movies():
     if genre:
         g = Category.query.filter_by(genre=genre).first()
         if not g:
-            return bad_request_response(f"Genre {genre} not found.!")
+            return bad_request_response(f"Genre {genre} not found!")
         titles = []
         for m in g.movies:
             titles.append(m.title)
