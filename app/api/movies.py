@@ -44,9 +44,12 @@ def list_movies():
     return jsonify(data)
 
 
-@bp.route("/movies/<int:movie_id>", methods=["PATCH"])
-@auth.login_required(role=["administrator"])
-def update_movie(movie_id):
+@bp.route("/movies", methods=["PATCH"])
+@auth.login_required(role="administrator")
+def update_movie():
+    movie_id = request.args.get("movie_id")
+    if not movie_id:
+        return bad_request_response("You must use the movie_id param in order to update a movie.")
     m = Movie.query.filter_by(id=movie_id).first()
     if m is None:
         return not_found_response(

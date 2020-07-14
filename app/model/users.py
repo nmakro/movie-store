@@ -17,23 +17,6 @@ class User(db.Model):
             "watchlist": [m.movie_dict() for m in self.movies],
             "orders": [o.order_dict() for o in self.orders],
         }
-        if not username:
-            data = {
-                self.username: {
-                    "user id": self.id,
-                    "watchlist": [
-                        {m.title: m.movie_dict(title=False)} for m in self.movies
-                    ],
-                    "orders": [
-                        {
-                            "Order id:": o.id,
-                            "Movie": self.get_movie_title_from_order(o.movie_id),
-                            "Status": "Paid" if o.paid else "Not paid",
-                        }
-                        for o in self.orders
-                    ],
-                }
-            }
 
         return data
 
