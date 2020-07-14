@@ -6,6 +6,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     DEBUG = False
     TESTING = False
+    PER_PAGE = 4
+    PAGE = 1
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

@@ -1,5 +1,6 @@
-from flask import jsonify, request
+from flask import jsonify, request, url_for
 from app import db
+from moviestore import app
 from app.api import bp
 from app.api.errors import bad_request_response, already_exists_response, not_found_response, successful_update
 from app.model.categories import Category
@@ -7,22 +8,25 @@ from app.api.auth import auth
 
 
 @bp.route("/categories/", methods=["GET"])
-@bp.route("/categories", methods=["GET"])
-def get_categories():
-    if len(request.args) > 0:
-        genre = request.args.get("genre")
-        if genre:
-            if genre == "all":
-                items = Category.query.order_by(Category.genre.desc()).paginate(1, 20, False).items
-                data, status_code = ({"items": [c.category_dict() for c in items]}, 200) if items else ({"error:": "Category not found!"}, 404)
-            else:
-                c = Category.query.filter_by(genre=genre).first()
-                data, status_code = ({"category": c.genre, "movies": [m.movie_dict(genre=False) for m in c.movies]}, 200) if c is not None else ({"error:": "Category not found!"}, 404)
+def list_categories():
+    genre = request.args.get("genre")
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', app.config['PER_PAGE'], type=int)
+    if genre:
+        if genre == "all":
+            categories = Category.query.order_by(Category.genre.desc()).paginate(page, per_page, False)
         else:
-            data, status_code = ({"error": "Unknown query param"}, 400)
+            categories = Category.query.filter_by(genre=genre).paginate(page, per_page, False)
+        next_url = url_for('api.list_categories', page=categories.next_num, genre=genre) \
+            if categories.has_next else None
+        prev_url = url_for('api.list_categories', page=categories.prev_num, genre=genre) \
+            if categories.has_prev else None
+        data, status_code = ({"_meta": {"next": next_url, "prev": prev_url}, "categories": [c.category_dict() for c in categories.items]}, 200) \
+            if categories.items else ({"error:": "Category not found!"}, 404)
+
     else:
-        items = Category.query.order_by(Category.genre.desc()).paginate(1, 20, False).items
-        data, status_code = ({"items": [c.genre for c in items]}, 200) if items else ({"error:": "No categories found"}, 404)
+        items = Category.query.order_by(Category.genre.desc())
+        data, status_code = ({"categories": [c.genre for c in items]}, 200) if items else ({"error:": "No categories found"}, 404)
     res = jsonify(data)
     res.status_code = status_code
     return res
@@ -36,6 +40,8 @@ def add_category():
         return bad_request_response("You must specify the genre param in order to create a new category.")
     if Category.query.filter_by(genre=genre).first() is not None:
         return already_exists_response("The category you specified already exists.")
+    if genre == "all":
+        return bad_request_response("You cannot add 'all' as a genre.")
     c = Category(genre=genre)
     db.session.add(c)
     db.session.commit()
