@@ -12,17 +12,10 @@ class User(db.Model):
 
     def user_dict(self, username=True):
         data = {
-            "User": self.username,
+            "username": self.username,
             "user id": self.id,
-            "watchlist": [{m.title: m.movie_dict(title=False)} for m in self.movies],
-            "orders": [
-                {
-                    "Order id:": o.id,
-                    "Movie": self.get_movie_title_from_order(o.movie_id),
-                    "Status": "Paid" if o.paid else "Not paid",
-                }
-                for o in self.orders
-            ],
+            "watchlist": [m.movie_dict() for m in self.movies],
+            "orders": [o.order_dict() for o in self.orders],
         }
         if not username:
             data = {

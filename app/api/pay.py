@@ -3,7 +3,11 @@ from app import db
 from app.api import bp
 from app.model.orders import Order
 from app.model.users import User
-from app.api.errors import not_found_response, already_exists_response, unauthorized_access
+from app.api.errors import (
+    not_found_response,
+    already_exists_response,
+    unauthorized_access,
+)
 from app.api.auth import auth
 
 

@@ -1,19 +1,28 @@
-from flask import jsonify
+from flask import jsonify, request
 from app.api import bp
 from app import db
 from app.model.movies import Movie
 from app.model.users import User
-from app.api.errors import not_found_response, already_exists_response
+from app.api.errors import (
+    not_found_response,
+    already_exists_response,
+    bad_request_response,
+)
 from app.model.orders import Order
 from app.api.auth import auth
 
 
-@bp.route("/rent/<int:movie_id>", methods=["POST"])
+@bp.route("/rent", methods=["POST"])
 @auth.login_required()
-def rent_title(movie_id):
+def rent_title():
     user = User.query.filter_by(username=auth.username()).first()
     if not user and auth.username() != user.username:
         return "Access Denied", 401
+    movie_id = request.args.get("movie_id")
+    if not movie_id:
+        return bad_request_response(
+            "You must specify the movie id using movie_id param in order to rent a movie."
+        )
     movie = Movie.query.filter_by(id=movie_id).first()
     if not movie:
         return not_found_response(

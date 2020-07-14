@@ -1,6 +1,5 @@
 from datetime import datetime
 from app import db
-from app.model.movies import Movie
 
 
 class Order(db.Model):
@@ -17,9 +16,18 @@ class Order(db.Model):
             "order date": self.date_purchased,
             "status": "Paid" if self.paid else "Not paid",
             "user id": self.user_id,
-            "movie": self.movie_id
+            "movie": self.movie_id,
+            "charge price": self.get_charge_per_order(),
         }
         return data
+
+    def get_charge_per_order(self):
+        now = datetime.now()
+        days_passed = (now - self.date_purchased).days
+        charge = 1
+        if days_passed > 3:
+            charge += charge + (days_passed - 3) * 0.5
+        return charge
 
     def __repr__(self):
         return f"Order: {self.id}"

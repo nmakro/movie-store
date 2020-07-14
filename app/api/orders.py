@@ -13,14 +13,14 @@ def list_orders():
         users = User.query.all()
         orders = Order.query.all()
 
-        #payload = {"Orders": {order.id: [order.order_dict() for order in u.orders] for u in users}}
+        # payload = {"Orders": {order.id: [order.order_dict() for order in u.orders] for u in users}}
         payload = {"orders": [order.order_dict() for order in orders]}
 
     else:
 
         user = User.query.filter_by(username=auth.current_user()).first()
         if not user and not (
-                auth.current_user() == "admin" or auth.username() == user.username
+            auth.current_user() == "admin" or auth.username() == user.username
         ):
             return unauthorized_access()
         payload = {

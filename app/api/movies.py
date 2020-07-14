@@ -5,6 +5,7 @@ from app.api.errors import (
     bad_request_response,
     not_found_response,
     already_exists_response,
+    successful_update,
 )
 from app.model.movies import Movie
 from app.api.categories import Category
@@ -15,19 +16,6 @@ from app.api.auth import auth
 def get_movie_from_id(movie_id):
     movie = Movie.query.filter_by(id=movie_id).first()
     payload, status_code = (
-        ({movie.title: movie.movie_dict(title=False)}, 200)
-        if movie
-        else ({"error": "Movie not found"}, 404)
-    )
-    res = jsonify(payload)
-    res.status_code = status_code
-    return res
-
-
-@bp.route("/movies/<string:title>", methods=["GET"])
-def get_movie_from_title(title):
-    movie = Movie.query.filter_by(title=title).first()
-    payload, status_code = (
         (movie.movie_dict(), 200) if movie else ({"error": "Movie not found"}, 404)
     )
     res = jsonify(payload)
@@ -35,11 +23,24 @@ def get_movie_from_title(title):
     return res
 
 
+@bp.route("/movies/search/", methods=["GET"])
+def get_movie_from_title():
+    title = request.args.get("title")
+    if not title:
+        return bad_request_response(
+            "You must specify the title param in order to search a movie"
+        )
+    movies = Movie.query.filter_by(title=title).all()
+    payload = {"movies": [m.dict for m in movies]}
+    res = jsonify(payload)
+    return res
+
+
 @bp.route("/movies/", methods=["GET"])
 @bp.route("/movies", methods=["GET"])
-def get_movies():
+def list_movies():
     res = Movie.query.order_by(Movie.id.desc()).paginate(1, 20, False).items
-    data = {"items": {"movies": [{movie.title: movie.movie_dict()} for movie in res]}}
+    data = {"items": {"movies": [movie.movie_dict() for movie in res]}}
     return jsonify(data)
 
 
@@ -104,3 +105,15 @@ def create_movie():
     res.headers["Location"] = url_for("api.get_movie_from_id", movie_id=new_movie.id)
 
     return res
+
+
+@bp.route("/movies/<int:movie_id>", methods=["DELETE"])
+@auth.login_required(role="administrator")
+def delete_movie(movie_id):
+    movie = Movie.query.filter_by(id=movie_id).first()
+    if not movie:
+        return not_found_response("Movie not found.")
+    db.session.delete(movie)
+    db.session.commit()
+
+    return successful_update()

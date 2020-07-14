@@ -15,10 +15,13 @@ from app.api.auth import auth
 @bp.route("/home")
 @auth.login_required
 def get_home_page():
+    if auth.username() == "admin":
+        payload = {"message": "You are admin"}
+        return jsonify(payload)
     user = User.query.filter_by(username=auth.current_user()).first()
-    if not (auth.current_user() == "admin" or auth.username() == user.username):
+    if not auth.username() == user.username:
         return unauthorized_access()
-    payload, status_code = user.user_dict(username=False), 200
+    payload, status_code = user.user_dict(), 200
     res = jsonify(payload)
     res.status_code = status_code
     return res

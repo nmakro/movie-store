@@ -18,7 +18,7 @@ def make_shell_context():
         "Category": Category,
         "Order": Order,
         "configMap": configMap,
-        "app": app
+        "app": app,
     }
 
 
