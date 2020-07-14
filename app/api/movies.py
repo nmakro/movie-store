@@ -1,4 +1,4 @@
-from flask import jsonify, request, url_for
+from flask import jsonify, request, url_for, current_app
 from app.api import bp
 from app import db
 from app.api.errors import (
@@ -39,8 +39,30 @@ def get_movie_from_title():
 @bp.route("/movies/", methods=["GET"])
 @bp.route("/movies", methods=["GET"])
 def list_movies():
-    res = Movie.query.order_by(Movie.id.desc()).paginate(1, 20, False).items
-    data = {"items": {"movies": [movie.movie_dict() for movie in res]}}
+    genre = request.args.get("genre")
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", current_app.config["PER_PAGE"], type=int)
+    if genre:
+        g = Category.query.filter_by(genre=genre).first()
+        if not g:
+            return bad_request_response(f"Genre {genre} not found.!")
+        titles = []
+        for m in g.movies:
+            titles.append(m.title)
+        res = Movie.query.filter(Movie.title.in_(titles)).paginate(page=page, per_page=per_page, error_out=False)
+    else:
+        res = Movie.query.order_by(Movie.title.asc()).paginate(page=page, per_page=per_page, error_out=False)
+    next_url = (
+        url_for("api.list_movies", page=res.next_num, genre=genre)
+        if res.has_next
+        else None
+    )
+    prev_url = (
+        url_for("api.list_movies", page=res.prev_num, genre=genre)
+        if res.has_prev
+        else None
+    )
+    data = {"_meta": {"next": next_url, "prev": prev_url}, "movies": [movie.movie_dict() for movie in res.items]}
     return jsonify(data)
 
 
@@ -57,7 +79,7 @@ def update_movie():
         )
     for param in request.args.keys():
         if param not in ["id", "orders"] and hasattr(m, param):
-            if param == "category":
+            if param == "genre":
                 c = Category.query.filter_by(genre=request.args.get(param)).first()
                 if not c:
                     return not_found_response(
@@ -82,7 +104,7 @@ def update_movie():
 def create_movie():
     title = request.args.get("title")
     director = request.args.get("director")
-    if title is None and director is None:
+    if title is None or director is None:
         return bad_request_response(
             "You must the specify the title and director params in order to create a movie"
         )

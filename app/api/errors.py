@@ -35,7 +35,10 @@ def unauthorized_access():
     return response
 
 
-def successful_update():
-    res = jsonify({})
+def successful_update(message=None):
+    payload = {}
+    if message:
+        payload["message"] = message
+    res = jsonify(payload)
     res.status_code = 204
     return res

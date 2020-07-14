@@ -1,5 +1,4 @@
 from app import db
-from app.model.movies import Movie
 from app.model.table_associations import UserMovies
 
 
@@ -10,7 +9,7 @@ class User(db.Model):
     movies = db.relationship("Movie", secondary=UserMovies, backref=db.backref("users"))
     orders = db.relationship("Order", backref="user")
 
-    def user_dict(self, username=True):
+    def user_dict(self):
         data = {
             "username": self.username,
             "user id": self.id,

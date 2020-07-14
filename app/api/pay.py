@@ -16,7 +16,7 @@ from app.api.auth import auth
 @auth.login_required
 def pay_title():
     order_id = request.args.get("order_id")
-    amount = request.args.get("amount")
+    amount = request.args.get("amount", type=int)
     if not order_id:
         return bad_request_response("You must the order_id param to pay an order.")
     if not amount:
