@@ -1,6 +1,12 @@
 from flask import request, jsonify
 from app.api import bp
-from app.api.errors import not_found_response, unauthorized_acess, already_exists_response, bad_request_response, successful_update
+from app.api.errors import (
+    not_found_response,
+    unauthorized_acess,
+    already_exists_response,
+    bad_request_response,
+    successful_update,
+)
 from app.model.users import User
 from app.api.auth import auth
 

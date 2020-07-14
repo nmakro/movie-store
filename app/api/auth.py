@@ -5,7 +5,7 @@ auth = HTTPBasicAuth()
 
 users = {
     "admin": generate_password_hash("admin_pass"),
-    "Chris": generate_password_hash("test_user_pass")
+    "Chris": generate_password_hash("test_user_pass"),
 }
 
 

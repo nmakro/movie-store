@@ -9,10 +9,7 @@ class Category(db.Model):
     movies = db.relationship("Movie", secondary=MovieCategories)
 
     def category_dict(self):
-        data = {
-                "genre": self.genre,
-                "movies": [m.title for m in self.movies]
-            }
+        data = {"genre": self.genre, "movies": [m.title for m in self.movies]}
 
         return data
 

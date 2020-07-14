@@ -18,11 +18,19 @@ class TestConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///" + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL"
+    ) or "sqlite:///" + os.path.join(basedir, "app.db")
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///" + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL"
+    ) or "sqlite:///" + os.path.join(basedir, "app.db")
 
 
-configMap = {"PROD_ENV": ProductionConfig, "TEST_ENV": TestConfig, "DEV_ENV": DevelopmentConfig}
+configMap = {
+    "PROD_ENV": ProductionConfig,
+    "TEST_ENV": TestConfig,
+    "DEV_ENV": DevelopmentConfig,
+}

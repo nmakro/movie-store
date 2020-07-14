@@ -1,7 +1,13 @@
 import re
 from flask import request, jsonify
 from app.api import bp
-from app.api.errors import not_found_response, unauthorized_acess, already_exists_response, bad_request_response, successful_update
+from app.api.errors import (
+    not_found_response,
+    unauthorized_acess,
+    already_exists_response,
+    bad_request_response,
+    successful_update,
+)
 from app.model.users import User
 from app.api.auth import auth
 
@@ -12,10 +18,16 @@ from app.api.auth import auth
 def get_users():
     if request.args.get("user_id"):
         user = User.query.filter_by(id=request.args.get("user_id")).first()
-        payload, status_code = (user.user_dict(), 200) if user else ({"error": "User not found!"}, 404)
+        payload, status_code = (
+            (user.user_dict(), 200) if user else ({"error": "User not found!"}, 404)
+        )
     else:
         res = User.query.order_by(User.username.desc()).paginate(1, 20, False).items
-        payload, status_code = ({"Users": [user.user_dict(username=False) for user in res]}, 200) if res else ({"error": "User not found!"}, 404)
+        payload, status_code = (
+            ({"Users": [user.user_dict(username=False) for user in res]}, 200)
+            if res
+            else ({"error": "User not found!"}, 404)
+        )
     res = jsonify(payload)
     res.status_code = status_code
     return res
@@ -39,9 +51,13 @@ def update_username(user_id):
                 else:
                     u = User.query.filter_by(username=request.args.get(param))
                     if u:
-                        return already_exists_response(f"Username {u.username} is used by another user. Please user another username.")
-                    elif not bool(re.search('[a-zA-Z]', request.args.get(param))):
-                        return bad_request_response("You cannot have an empty username.")
+                        return already_exists_response(
+                            f"Username {u.username} is used by another user. Please user another username."
+                        )
+                    elif not bool(re.search("[a-zA-Z]", request.args.get(param))):
+                        return bad_request_response(
+                            "You cannot have an empty username."
+                        )
                     else:
                         user.username = request.args.get(param)
                         break
@@ -63,11 +79,15 @@ def update_user(user_id):
                 continue
             else:
                 if param == "username":
-                    if not bool(re.search('[a-zA-Z]', request.args.get(param))):
-                        return bad_request_response("You cannot have an empty username.")
+                    if not bool(re.search("[a-zA-Z]", request.args.get(param))):
+                        return bad_request_response(
+                            "You cannot have an empty username."
+                        )
                     u = User.query.filter_by(username=request.args.get(param))
                     if u:
-                        return already_exists_response(f"Username {u.username} is used by another user. Please user another username.")
+                        return already_exists_response(
+                            f"Username {u.username} is used by another user. Please user another username."
+                        )
                     user.username = request.args.get(param)
                 if param == "movie":
                     if request.args.get(param) in user.movies:
@@ -75,7 +95,9 @@ def update_user(user_id):
                     elif request.args.get(param) == "":
                         for order in user.orders:
                             if not order.paid and order.ordered_movie in user.movies:
-                                return bad_request_response("In order to delete movies from your watchlist, you must first pay all pending subscriptions.")
+                                return bad_request_response(
+                                    "In order to delete movies from your watchlist, you must first pay all pending subscriptions."
+                                )
                         user.movies = []
                     else:
                         continue
@@ -91,8 +113,15 @@ def user_orders(user_id):
         if auth.current_user() != "admin" and auth.username() != user.username:
             return unauthorized_acess()
     if not user:
-        return not_found_response("The user_id provided does not match a user in the database.")
-    payload = {"items": [{f"order id: {order.id}": order.ordered_movie.title, "Paid": order.paid} for order in user.orders]}
+        return not_found_response(
+            "The user_id provided does not match a user in the database."
+        )
+    payload = {
+        "items": [
+            {f"order id: {order.id}": order.ordered_movie.title, "Paid": order.paid}
+            for order in user.orders
+        ]
+    }
     res = jsonify(payload)
     return res
 
@@ -104,6 +133,8 @@ def get_watched_history(user_id):
         if auth.current_user() != "admin" and auth.username() != user.username:
             return unauthorized_acess()
     if not user:
-        return not_found_response(message="The user_id provided does not match a user in the database.")
+        return not_found_response(
+            message="The user_id provided does not match a user in the database."
+        )
     payload = {"Movies watched:": [movie.movie_dict() for movie in user.movies]}
     return jsonify(payload)

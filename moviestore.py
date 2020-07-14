@@ -11,7 +11,14 @@ app = create_app()
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': User, 'Movie': Movie, 'Category': Category, 'Order': Order, 'configMap': configMap}
+    return {
+        "db": db,
+        "User": User,
+        "Movie": Movie,
+        "Category": Category,
+        "Order": Order,
+        "configMap": configMap,
+    }
 
 
 if __name__ == "__main__":

@@ -1,7 +1,11 @@
 from flask import jsonify, request, url_for
 from app.api import bp
 from app import db
-from app.api.errors import bad_request_response, not_found_response, already_exists_response
+from app.api.errors import (
+    bad_request_response,
+    not_found_response,
+    already_exists_response,
+)
 from app.model.movies import Movie
 from app.api.categories import Category
 from app.api.auth import auth
@@ -10,7 +14,11 @@ from app.api.auth import auth
 @bp.route("/movies/<int:movie_id>", methods=["GET"])
 def get_movie_from_id(movie_id):
     movie = Movie.query.filter_by(id=movie_id).first()
-    payload, status_code = ({movie.title: movie.movie_dict(title=False)}, 200) if movie else ({"error": "Movie not found"}, 404)
+    payload, status_code = (
+        ({movie.title: movie.movie_dict(title=False)}, 200)
+        if movie
+        else ({"error": "Movie not found"}, 404)
+    )
     res = jsonify(payload)
     res.status_code = status_code
     return res
@@ -19,7 +27,9 @@ def get_movie_from_id(movie_id):
 @bp.route("/movies/<string:title>", methods=["GET"])
 def get_movie_from_title(title):
     movie = Movie.query.filter_by(title=title).first()
-    payload, status_code = (movie.movie_dict(), 200) if movie else ({"error": "Movie not found"}, 404)
+    payload, status_code = (
+        (movie.movie_dict(), 200) if movie else ({"error": "Movie not found"}, 404)
+    )
     res = jsonify(payload)
     res.status_code = status_code
     return res
@@ -38,13 +48,17 @@ def get_movies():
 def update_movie(movie_id):
     m = Movie.query.filter_by(id=movie_id).first()
     if m is None:
-        return not_found_response("The movie_id provided does not a match a movie in the database.")
+        return not_found_response(
+            "The movie_id provided does not a match a movie in the database."
+        )
     for param in request.args.keys():
         if param not in ["id", "orders"] and hasattr(m, param):
             if param == "category":
                 c = Category.query.filter_by(genre=request.args.get(param)).first()
                 if not c:
-                    return not_found_response("There is no such category in the database.")
+                    return not_found_response(
+                        "There is no such category in the database."
+                    )
                 else:
                     m.category.append(c)
             else:
@@ -65,7 +79,9 @@ def create_movie():
     title = request.args.get("title")
     director = request.args.get("director")
     if title is None and director is None:
-        return bad_request_response("You must the specify the title and director params in order to create a movie")
+        return bad_request_response(
+            "You must the specify the title and director params in order to create a movie"
+        )
     m = Movie.query.filter_by(title=title, director=director).first()
     if m:
         return already_exists_response("The movie provided is already in the database.")

@@ -11,7 +11,9 @@ from app.api.auth import auth
 def pay_title(order_id):
     order = Order.query.filter_by(id=order_id).first()
     if not order:
-        return not_found_response("The order_id provided does not a match an order in the database.")
+        return not_found_response(
+            "The order_id provided does not a match an order in the database."
+        )
     if auth.username() != order.user_id.username:
         return "Access Denied", 401
     if order.paid:

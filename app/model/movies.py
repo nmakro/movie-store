@@ -3,13 +3,13 @@ from app.model.table_associations import MovieCategories
 
 
 class Movie(db.Model):
-    __tablename__ = 'movies'
+    __tablename__ = "movies"
     id = db.Column(db.Integer, primary_key=True)
     director = db.Column(db.String(64))
     year = db.Column(db.String(4))
     title = db.Column(db.String(64))
     category = db.relationship("Category", secondary=MovieCategories)
-    orders = db.relationship('Order', backref='ordered_movie')
+    orders = db.relationship("Order", backref="ordered_movie")
 
     def movie_dict(self, title=True):
         data = {
@@ -17,7 +17,7 @@ class Movie(db.Model):
             "title": self.title,
             "director": self.director,
             "year": self.year,
-            "genre": [c.genre for c in self.category]
+            "genre": [c.genre for c in self.category],
         }
         if not title:
             data = {
@@ -25,7 +25,7 @@ class Movie(db.Model):
                     "id": self.id,
                     "director": self.director,
                     "year": self.year,
-                    "genre": [c.genre for c in self.category]
+                    "genre": [c.genre for c in self.category],
                 }
             }
 

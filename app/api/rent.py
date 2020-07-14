@@ -16,7 +16,9 @@ def rent_title(movie_id):
         return "Access Denied", 401
     movie = Movie.query.filter_by(id=movie_id).first()
     if not movie:
-        return not_found_response("The movie_id provided does not match a movie in the database.")
+        return not_found_response(
+            "The movie_id provided does not match a movie in the database."
+        )
     order = Order.query.filter_by(movie_id=movie_id, user_id=user.id).first()
     if order:
         return already_exists_response("You have already purchased this movie.")
@@ -27,6 +29,3 @@ def rent_title(movie_id):
     res = jsonify({})
     res.status_code = 201
     return res
-
-
-
