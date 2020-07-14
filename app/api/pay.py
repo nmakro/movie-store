@@ -2,7 +2,8 @@ from flask import jsonify
 from app import db
 from app.api import bp
 from app.model.orders import Order
-from app.api.errors import not_found_response, already_exists_response
+from app.model.users import User
+from app.api.errors import not_found_response, already_exists_response, unauthorized_access
 from app.api.auth import auth
 
 
@@ -14,8 +15,9 @@ def pay_title(order_id):
         return not_found_response(
             "The order_id provided does not a match an order in the database."
         )
-    if auth.username() != order.user_id.username:
-        return "Access Denied", 401
+    u = User.query.filter_by(username=auth.username()).first()
+    if not u or u.id != order.user_id:
+        return unauthorized_access()
     if order.paid:
         return already_exists_response("The order is already paid.")
     order.paid = True

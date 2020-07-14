@@ -3,7 +3,7 @@ from flask import request, jsonify
 from app.api import bp
 from app.api.errors import (
     not_found_response,
-    unauthorized_acess,
+    unauthorized_access,
     already_exists_response,
     bad_request_response,
     successful_update,
@@ -41,7 +41,7 @@ def update_username(user_id):
         return not_found_response("User not found!")
     else:
         if not (auth.current_user() == "admin" or auth.username() == user.username):
-            return unauthorized_acess()
+            return unauthorized_access()
         for param in request.args.keys():
             if param == "username":
                 if user.username == request.args.get(param):
@@ -73,7 +73,7 @@ def update_user(user_id):
         return not_found_response("User not found!")
     else:
         if not (auth.current_user() == "admin" or auth.username() == user.username):
-            return unauthorized_acess()
+            return unauthorized_access()
         for param in request.args.keys():
             if param == "id":
                 continue
@@ -111,7 +111,7 @@ def user_orders(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:
         if auth.current_user() != "admin" and auth.username() != user.username:
-            return unauthorized_acess()
+            return unauthorized_access()
     if not user:
         return not_found_response(
             "The user_id provided does not match a user in the database."
@@ -131,7 +131,7 @@ def get_watched_history(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:
         if auth.current_user() != "admin" and auth.username() != user.username:
-            return unauthorized_acess()
+            return unauthorized_access()
     if not user:
         return not_found_response(
             message="The user_id provided does not match a user in the database."

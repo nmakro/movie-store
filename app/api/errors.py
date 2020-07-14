@@ -28,7 +28,7 @@ def not_found_response(message=None):
     return response
 
 
-def unauthorized_acess():
+def unauthorized_access():
     payload = {"error": 401, "message": "Access denied:"}
     response = jsonify(payload)
     response.status_code = 401

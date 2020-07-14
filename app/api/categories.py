@@ -1,6 +1,5 @@
-from flask import jsonify, request, url_for
+from flask import jsonify, request, url_for, current_app
 from app import db
-from moviestore import app
 from app.api import bp
 from app.api.errors import (
     bad_request_response,
@@ -16,7 +15,7 @@ from app.api.auth import auth
 def list_categories():
     genre = request.args.get("genre")
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", app.config["PER_PAGE"], type=int)
+    per_page = request.args.get("per_page", current_app.config["PER_PAGE"], type=int)
     if genre:
         if genre == "all":
             categories = Category.query.order_by(Category.genre.desc()).paginate(
