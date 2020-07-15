@@ -68,12 +68,12 @@ def search_movies():
         page=page, per_page=per_page, error_out=False
     )
     next_url = (
-        url_for("api.list_movies", page=res.next_num, genre=genre)
+        url_for("api.search_movies", page=res.next_num, genre=genre)
         if res.has_next
         else None
     )
     prev_url = (
-        url_for("api.list_movies", page=res.prev_num, genre=genre)
+        url_for("api.search_movies", page=res.prev_num, genre=genre)
         if res.has_prev
         else None
     )
