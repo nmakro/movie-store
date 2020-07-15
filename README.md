@@ -20,7 +20,7 @@
   
   - view all available info for the user using `GET`: endpoint api/v1//home/
  
- - login to gain access to the service by using the available users specified in the auth configuration.
+ - login to gain access to the service by using the available users specified in the basic auth configuration.
  - all actions that create, modify or delete are using authorization rules. 
  - only the admin user can modify movies, categories and orders.
  - click [here](https://github.com/nmakro/movie-store/blob/master/app/api/auth.py#L6) to see the current available users.
