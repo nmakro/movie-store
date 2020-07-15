@@ -18,7 +18,7 @@
  - pay a movie that was previously rent using `POST`: endpoint api/v1/pay. You must specify the order id and the amount to pay using the order_id and amount params.
    If the amount is less than the order's charge the payment will fail.
   
-  - view all available info for the user using `GET`: endpoint api/v1//home/
+  - view all available info for the user using `GET`: endpoint api/v1/home/
  
  - login to gain access to the service by using the available users specified in the basic auth configuration.
  - all actions that create, modify or delete are using authorization rules. 
