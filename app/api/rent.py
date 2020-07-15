@@ -16,7 +16,9 @@ from app.api.auth import auth
 @auth.login_required()
 def rent_title():
     user = User.query.filter_by(username=auth.username()).first()
-    if not user and auth.username() != user.username:
+    if auth.username() == "admin":
+        return bad_request_response("Admin cannot rent a movie")
+    if not user or auth.username() != user.username:
         return "Access Denied", 401
     movie_id = request.args.get("movie_id")
     if not movie_id:

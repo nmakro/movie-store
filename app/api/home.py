@@ -1,18 +1,11 @@
 from flask import request, jsonify
 from app.api import bp
-from app.api.errors import (
-    not_found_response,
-    unauthorized_access,
-    already_exists_response,
-    bad_request_response,
-    successful_update,
-)
+from app.api.errors import unauthorized_access
 from app.model.users import User
 from app.api.auth import auth
 
 
 @bp.route("/home/")
-@bp.route("/home")
 @auth.login_required
 def get_home_page():
     if auth.username() == "admin":

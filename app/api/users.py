@@ -24,7 +24,9 @@ def list_users():
             (user.user_dict(), 200) if user else ({"error": "User not found!"}, 404)
         )
     else:
-        res = User.query.order_by(User.username.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        res = User.query.order_by(User.username.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
         payload, status_code = (
             ({"Users": [user.user_dict() for user in res.items]}, 200)
             if res

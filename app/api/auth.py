@@ -8,6 +8,7 @@ users = {
     "Chris": generate_password_hash("test_user_pass"),
 }
 
+
 @auth.verify_password
 def verify_password(username, password):
     if username in users and check_password_hash(users.get(username), password):

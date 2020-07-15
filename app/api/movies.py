@@ -23,34 +23,15 @@ def get_movie_from_id(movie_id):
     return res
 
 
-@bp.route("/movies/search/", methods=["GET"])
-def get_movie_from_title():
-    title = request.args.get("title")
-    if not title:
-        return bad_request_response(
-            "You must specify the title param in order to search a movie"
-        )
-    movies = Movie.query.filter_by(title=title).all()
-    payload = {"movies": [m.dict for m in movies]}
-    res = jsonify(payload)
-    return res
-
-
 @bp.route("/movies/", methods=["GET"])
 def list_movies():
     genre = request.args.get("genre")
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", current_app.config["PER_PAGE"], type=int)
-    if genre:
-        g = Category.query.filter_by(genre=genre).first()
-        if not g:
-            return bad_request_response(f"Genre {genre} not found!")
-        titles = []
-        for m in g.movies:
-            titles.append(m.title)
-        res = Movie.query.filter(Movie.title.in_(titles)).paginate(page=page, per_page=per_page, error_out=False)
-    else:
-        res = Movie.query.order_by(Movie.title.asc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    res = Movie.query.order_by(Movie.title.asc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     next_url = (
         url_for("api.list_movies", page=res.next_num, genre=genre)
         if res.has_next
@@ -61,7 +42,45 @@ def list_movies():
         if res.has_prev
         else None
     )
-    data = {"_meta": {"next": next_url, "prev": prev_url}, "movies": [movie.movie_dict() for movie in res.items]}
+    data = {
+        "_meta": {"next": next_url, "prev": prev_url},
+        "movies": [movie.movie_dict() for movie in res.items],
+    }
+    return jsonify(data)
+
+
+@bp.route("/movies/search", methods=["GET"])
+def search_movies():
+    genre = request.args.get("genre")
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", current_app.config["PER_PAGE"], type=int)
+    if not genre:
+        return bad_request_response(
+            "You must specify a category using the genre parameter to search for a movie"
+        )
+    g = Category.query.filter_by(genre=genre).first()
+    if not g:
+        return bad_request_response(f"Genre {genre} not found!")
+    titles = []
+    for m in g.movies:
+        titles.append(m.title)
+    res = Movie.query.filter(Movie.title.in_(titles)).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    next_url = (
+        url_for("api.list_movies", page=res.next_num, genre=genre)
+        if res.has_next
+        else None
+    )
+    prev_url = (
+        url_for("api.list_movies", page=res.prev_num, genre=genre)
+        if res.has_prev
+        else None
+    )
+    data = {
+        "_meta": {"next": next_url, "prev": prev_url},
+        "movies": [movie.movie_dict() for movie in res.items],
+    }
     return jsonify(data)
 
 
@@ -70,7 +89,9 @@ def list_movies():
 def update_movie():
     movie_id = request.args.get("movie_id")
     if not movie_id:
-        return bad_request_response("You must use the movie_id param in order to update a movie.")
+        return bad_request_response(
+            "You must use the movie_id param in order to update a movie."
+        )
     m = Movie.query.filter_by(id=movie_id).first()
     if m is None:
         return not_found_response(
@@ -110,12 +131,11 @@ def create_movie():
     m = Movie.query.filter_by(title=title, director=director).first()
     if m:
         return already_exists_response("The movie provided is already in the database.")
-    req_json = request.args.keys()
     new_movie = Movie()
-    for param in req_json:
+    for param in request.args.keys():
         if hasattr(new_movie, param):
             setattr(new_movie, param, str(request.args.get(param)))
-        else:
+        elif param == "genre":
             c = Category.query.filter_by(genre=request.args.get(param)).first()
             if not c:
                 return not_found_response("There is no such category in the database.")
