@@ -18,14 +18,67 @@
  - pay a movie that was previously rent using `POST`: endpoint api/v1/pay. You must specify the order id and the amount to pay using the order_id and amount params.
    If the amount is less than the order's charge the payment will fail.
   
-  - view all available info for the user using `GET`: endpoint api/v1//home/
+  - view all available info for the user using `GET`: endpoint api/v1/home/
  
  - login to gain access to the service by using the available users specified in the basic auth configuration.
  - all actions that create, modify or delete are using authorization rules. 
  - only the admin user can modify movies, categories and orders.
  - click [here](https://github.com/nmakro/movie-store/blob/master/app/api/auth.py#L6) to see the current available users.
  - all list actions support pagination using the page/per_page params, defaulting to 1 and 4.
+ - a database with some initial setup is provided [here](https://github.com/nmakro/movie-store/blob/master/app/app.db)
   
+## Use
+  example usage:
+  search all movies by category:drama
+  http://127.0.0.1:5000/api/v1/movies/search?genre=drama
+  
+  ```json
+  {
+  "_meta": {
+    "next": "/api/v1/movies/?page=2&genre=drama", 
+    "prev": null
+  }, 
+  "movies": [
+    {
+      "director": "Lumet", 
+      "genre": [
+        "drama"
+      ], 
+      "id": 4, 
+      "title": "12 Angry Men", 
+      "year": "1957"
+    }, 
+    {
+      "director": "David Fincher", 
+      "genre": [
+        "drama"
+      ], 
+      "id": 6, 
+      "title": "Fight Club", 
+      "year": "1999"
+    }, 
+    {
+      "director": "Robert Zemeckis", 
+      "genre": [
+        "drama"
+      ], 
+      "id": 7, 
+      "title": "Forrest Gump", 
+      "year": "1994"
+    }, 
+    {
+      "director": "Martin Scorsese", 
+      "genre": [
+        "crime", 
+        "drama"
+      ], 
+      "id": 10, 
+      "title": "Goodfellas", 
+      "year": "1990"
+    }
+  ]
+}
+```
 
 
 ## Install
