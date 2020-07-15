@@ -21,9 +21,10 @@
   - view all available info for the user using `GET`: endpoint api/v1/home/
  
  - login to gain access to the service by using the available users specified in the basic auth configuration.
- - all actions that create, modify or delete are using authorization rules. 
+ - all actions that create, modify or delete are using authorization rules.
+ - data related to the user like orders, and info about a specific user require also authorization from the user or the admin.
  - only the admin user can modify movies, categories and orders.
- - click [here](https://github.com/nmakro/movie-store/blob/master/app/api/auth.py#L6) to see the current available users.
+ - click [here](https://github.com/nmakro/movie-store/blob/master/app/api/auth.py#L6) to see the current available users with authorization access.
  - all list actions support pagination using the page/per_page params, defaulting to 1 and 4.
  - a database with some initial setup is provided [here](https://github.com/nmakro/movie-store/blob/master/app/app.db)
   
