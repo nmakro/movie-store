@@ -1,12 +1,28 @@
+# IDE
 .idea/
+.vscode/
+*.swp
+*.swo
 
+# Python
 venv/
-
+.venv/
 *.pyc
 __pycache__/
-
 .pytest_cache/
 .coverage
 dist/
 build/
 *.egg-info/
+
+# Environment files
+.env
+.env.local
+.env*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
